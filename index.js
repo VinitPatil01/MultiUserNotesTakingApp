@@ -6,8 +6,8 @@ import StudentRouter from './src/routes/StudentRoutes.js'
 dotenv.config();
 export const connection = createDbConnection();
 const app = express();
-
 const port = process.env.APP_PORT;
+
 
 app.use(express.json());
 app.get("/", (request, response) => {

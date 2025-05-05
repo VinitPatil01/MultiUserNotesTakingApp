@@ -7,7 +7,7 @@ export function RegisterStudent(request, response) {
     try {
         const data = request.body;
         const encPasswd = hashSync(data.password,10)
-        const qry = `insert into user(prn,first_name,last_name,email,username,password,mobile_number,gender,course,center) values ('${data.prn}','${data.first_name}','${data.last_name}','${data.email}','${data.username}','${encPasswd}','${data.mobile_number}','${data.gender}','${data.course}','${data.center}')`;
+        const qry = `insert into student(prn,first_name,last_name,email,username,password,mobile_number,gender,course,center) values ('${data.prn}','${data.first_name}','${data.last_name}','${data.email}','${data.username}','${encPasswd}','${data.mobile_number}','${data.gender}','${data.course}','${data.center}')`;
         
         connection.query(qry,(error,result)=>{
             if (!error) {

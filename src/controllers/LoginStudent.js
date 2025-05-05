@@ -9,7 +9,7 @@ const privateKey = fs.readFileSync('src/keys/PrivateKey.pem');
 export function LoginStudent(request, response) {
     try {
         const data = request.body;
-        const qry = `select username,password from user where username='${data.username}'`;
+        const qry = `select username,password from student where username='${data.username}'`;
 
         connection.query(qry, (error, result) => {
             if (!error) {
