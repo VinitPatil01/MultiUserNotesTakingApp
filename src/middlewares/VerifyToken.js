@@ -5,26 +5,23 @@ const publicKey = fs.readFileSync('src/keys/PublicKey.pem')
 
 
 export function verifyToken(request, response, next) {
-
-    const AuthHeader = request.get('Authorization');
-
-    if (AuthHeader) {
-        const token = AuthHeader.split(" ")[1];
-        jwt.verify(token, publicKey, (error, payload) => {
-            if (!error) {
-                next();
-            } else {
-                response
-                    .status(StatusCodes.UNAUTHORIZED)
-                    .send({ message: "Token is invalid" })
-
-            }
-        })
+  const authHeader = request.get('Authorization');
+  if (!authHeader) {
+    return response
+      .status(StatusCodes.UNAUTHORIZED)
+      .send({ message: "Token is missing" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, publicKey, { algorithms: ['RS256'] }, (error, payload) => { // skdjarpbuiwj0 vinit 
+    if (!error) {
+      request.user = payload;
+      next();
     }
     else {
-        response
+      console.log(error);
+      return response
         .status(StatusCodes.UNAUTHORIZED)
-        .send({message:"Token is missing"})
+        .send({ message: "Token is invalid" });
     }
-
+  });
 }

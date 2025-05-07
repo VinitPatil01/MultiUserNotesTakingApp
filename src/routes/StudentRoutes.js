@@ -1,8 +1,8 @@
 import express from 'express';
-import { RegisterStudent } from '../controllers/StudentRegistration.js';
-import { LoginStudent } from '../controllers/LoginStudent.js';
+import { RegisterStudent } from '../controllers/Student/StudentRegistration.js';
+import { LoginStudent } from '../controllers/Student/LoginStudent.js';
 import { verifyToken } from '../middlewares/VerifyToken.js';
-import { getDashboard } from '../controllers/StudentDashboard.js';
+import { getDashboard } from '../controllers/Student/StudentDashboard.js';
 
 
 const StudentRouter = express.Router();
