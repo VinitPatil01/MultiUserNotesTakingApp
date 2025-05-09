@@ -3,6 +3,8 @@ import { RegisterStudent } from '../controllers/Student/StudentRegistration.js';
 import { LoginStudent } from '../controllers/Student/LoginStudent.js';
 import { verifyToken } from '../middlewares/VerifyToken.js';
 import { getDashboard } from '../controllers/Student/StudentDashboard.js';
+import { getSelfNotes } from '../controllers/Notes/getSelfNotes.js';
+import { getGroupNotes } from '../controllers/Notes/getGroupNotes.js';
 
 
 const StudentRouter = express.Router();
@@ -12,6 +14,8 @@ const StudentRouter = express.Router();
 StudentRouter.post('/',RegisterStudent);
 StudentRouter.post('/Login',LoginStudent);
 StudentRouter.get("/Dashboard/",verifyToken,getDashboard);
+StudentRouter.get("/selfnotes/",verifyToken,getSelfNotes);
+StudentRouter.get("/groupnotes/",verifyToken,getGroupNotes);
 
 
 export default StudentRouter;

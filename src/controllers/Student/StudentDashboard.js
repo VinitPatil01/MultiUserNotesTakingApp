@@ -4,9 +4,9 @@ import { connection } from "../../../index.js";
 
 export function getDashboard(request, response) {
   try {
-    const username = request.user.username;
+    const reqUsername = request.user.username;
     const GetStudentDetailsQry = `select prn,first_name from student where username=?`;
-    connection.query(GetStudentDetailsQry, [username], (error, result) => {
+    connection.query(GetStudentDetailsQry, [reqUsername], (error, result) => {
       if (error) {
         console.error(error);
         return response
@@ -21,8 +21,8 @@ export function getDashboard(request, response) {
       const prn = result[0].prn;
       const first_name = result[0].first_name;
       // fetch user-created/uploaded notes
-      const FetchUserNotesQry = `select note_id,title,type,text,pdf_url,created_at from notes where created_by=${prn}`
-      const FetchGroupNotesQry = `select N.note_id, N.title, N.type, N.text, N.pdf_url, N.created_at from notes N, NotesGroups NG, UserGroups UG where N.note_id=NG.note_id and NG.group_id = ug.group_id and UG.student_prn=${prn}`;
+      const FetchUserNotesQry = `select N.note_id, N.title,N.type,N.text,S.first_name,N.created_at,C.category_name,N.pdf_url from student S, notes N,categories C where N.created_by=S.prn and C.category_id=N.category_id and S.username='${reqUsername}'`
+      const FetchGroupNotesQry = `select N.note_id, N.title, N.type, N.text, N.pdf_url,S.first_name, N.created_at,C.category_name from student S, notes N, NotesGroups NG, UserGroups UG, categories C where N.note_id=NG.note_id and NG.group_id = ug.group_id and N.created_by=S.prn and C.category_id=N.category_id and UG.student_prn=${prn}`;
 
       connection.query(FetchUserNotesQry, (error1, selfNote) => {
         if (error1) {
