@@ -6,6 +6,7 @@ import { hashSync } from "bcrypt";
 export function RegisterStudent(request, response) {
     try {
         const data = request.body;
+        console.log(data);
         const encPasswd = hashSync(data.password,10)
         const qry = `insert into student(prn,first_name,last_name,email,username,password,mobile_number,gender,course,center) values ('${data.prn}','${data.first_name}','${data.last_name}','${data.email}','${data.username}','${encPasswd}','${data.mobile_number}','${data.gender}','${data.course}','${data.center}')`;
         
@@ -15,10 +16,11 @@ export function RegisterStudent(request, response) {
                 .status(StatusCodes.CREATED)
                 .send({message:"Student Registered Successfully"});
             } else {
+                console.log(error)
                 if(error.errno==1062){
                     response
                     .status(StatusCodes.BAD_REQUEST)
-                    .send({message:"Duplicate PRN not allowed"})
+                    .send({message:"Duplicates not allowed"})
                 }else{
                     console.log(error);
                     response

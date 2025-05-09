@@ -2,10 +2,6 @@ import { StatusCodes } from "http-status-codes";
 import { connection } from "../../../index.js";
 
 
-
-
-
-
 export function getDashboard(request, response) {
   try {
     const username = request.user.username;
@@ -22,10 +18,11 @@ export function getDashboard(request, response) {
           .status(StatusCodes.NOT_FOUND)
           .send({ message: "User not found" });
       }
-      const [prn, first_Name] = result[0];
+      const prn = result[0].prn;
+      const first_name = result[0].first_name;
       // fetch user-created/uploaded notes
-      const FetchUserNotesQry = `select note_id,title,type,text,pdf_url,created_ad from notes where created_by=${prn}`
-      const FetchGroupNotesQry = `select N.id, N.title, N.type, N.text, N.pdf_url, N.created_at from notes N, NotesGroups NG, UserGroups UG where N.note_id=NG.note_id and NG.group_id = ug.group_id and UG.student_prn=${prn}`;
+      const FetchUserNotesQry = `select note_id,title,type,text,pdf_url,created_at from notes where created_by=${prn}`
+      const FetchGroupNotesQry = `select N.note_id, N.title, N.type, N.text, N.pdf_url, N.created_at from notes N, NotesGroups NG, UserGroups UG where N.note_id=NG.note_id and NG.group_id = ug.group_id and UG.student_prn=${prn}`;
 
       connection.query(FetchUserNotesQry, (error1, selfNote) => {
         if (error1) {
@@ -45,7 +42,7 @@ export function getDashboard(request, response) {
           return response
           .status(StatusCodes.OK)
           .send({
-            message:`${first_Name}`,
+            message:`${first_name}`,
             selfNotes:selfNote,
             groupNotes:groupNote
           })

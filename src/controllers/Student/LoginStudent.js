@@ -13,7 +13,6 @@ export function LoginStudent(request, response) {
         connection.query(qry, (error, result) => {
             if (result.length != 0) {
                 if (!error) {
-                    console.log(result)
                     if (compareSync(data.password, result[0].password)) {
                         const token = jwt.sign(
                             { username: result[0].username }, 
