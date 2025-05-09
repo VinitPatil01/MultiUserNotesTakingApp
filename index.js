@@ -3,12 +3,13 @@ import dotenv from 'dotenv';
 import { StatusCodes } from 'http-status-codes';
 import { createDbConnection } from './src/DbConfig/DbConfig.js';
 import StudentRouter from './src/routes/StudentRoutes.js'
+import cors from 'cors';
 dotenv.config();
 export const connection = createDbConnection();
 const app = express();
 const port = process.env.APP_PORT;
 
-
+app.use(cors());
 app.use(express.json());
 app.get("/", (request, response) => {
     response
