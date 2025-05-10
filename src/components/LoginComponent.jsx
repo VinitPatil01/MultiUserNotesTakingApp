@@ -1,40 +1,57 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // ← Add useNavigate
 
 const LoginComponent = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // ← Initialize navigate
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError("");
+
+  //   try {
+  //     const response = await fetch("http://localhost:5000/api/login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ username, password }),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (response.ok) {
+  //       alert("Login successful!");
+  //       navigate("/dashboard"); // ← Redirect to Dashboard
+  //     } else {
+  //       setError(data.message || "Login failed");
+  //     }
+  //   } catch (err) {
+  //     setError("Something went wrong. Try again later.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
+  // Simulate successful login
+  setTimeout(() => {
+    alert("Login successful!");
+    navigate("/dashboard");
+    setLoading(false);
+  }, 1000);
+};
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Login successful!");
-      } else {
-        setError(data.message || "Login failed");
-      }
-    } catch (err) {
-      setError("Something went wrong. Try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[#d84357] via-[#c63679] to-[#9b2e91]">
@@ -79,9 +96,9 @@ const LoginComponent = () => {
             {loading ? "Logging in..." : "Login"}
           </motion.button>
         </form>
-     <p className="text-sm text-center mt-4 text-blue-600 hover:underline cursor-pointer">
-  <Link to="/signup">Don't have an account? Sign up</Link>
-</p>
+        <p className="text-sm text-center mt-4 text-blue-600 hover:underline cursor-pointer">
+          <Link to="/signup">Don't have an account? Sign up</Link>
+        </p>
       </motion.div>
     </div>
   );
