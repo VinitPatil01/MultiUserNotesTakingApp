@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { createDbConnection } from './src/DbConfig/DbConfig.js';
 import StudentRouter from './src/routes/StudentRoutes.js'
 import cors from 'cors';
+import notesRouter from './src/routes/notesRoutes.js';
 dotenv.config();
 export const connection = createDbConnection();
 const app = express();
@@ -18,7 +19,7 @@ app.get("/", (request, response) => {
 });
 
 app.use("/student",StudentRouter)
-
+app.use("/notes",notesRouter)
 
 app.listen(port, (error) => {
     console.log("Server Started Successfully........")

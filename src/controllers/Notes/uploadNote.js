@@ -1,46 +1,55 @@
 import { StatusCodes } from "http-status-codes";
 import path from 'path';
+import { fileURLToPath } from "url";
 import fs from 'fs';
-import { connection } from "../../../index.js";
+import pool from "../../DbConfig/promiseDbConfig.js";
 
-export function uploadNotes(request, response) {
+
+const CurrDirName = path.dirname(fileURLToPath(import.meta.url));
+
+export async function uploadNotes(request, response) {
     try {
-        const {title, type, text, created_by} = request.body;
         const file = request.file;
-
-        const columns = ['title', 'type', 'text', 'created_by', 'created_at'];
-        const values = [title, type, text, created_by, new Date()];
-        const parameters = ['?', '?', '?', '?', '?'];
-
+        const username = request.user.username;
+        const { title, type, text, category_id } = request.body;
+        const [prnResult]= await pool.query(`select prn from student where username='${username}'`);
+        const prn_no = prnResult[0].prn
+        const columns = ['title', 'type', 'text', 'created_by', 'created_at', 'category_id'];
+        const values = [title, type, text, prn_no, new Date(), category_id];
+        const parameters = ['?', '?', '?', '?', '?', '?'];
         if (file) {
-            const customDir = path.join('uploads', created_by);
-            if (!fs.existsSync(customDir)) {
-                fs.mkdirSync(customDir, { recursive: true });
+            
+            const UploadsDir = path.join(CurrDirName, '../../../Pdf_Notes/uploads', username);
+            const FinalFileUploadPath = path.join(UploadsDir, file.originalname);
+            if (!fs.existsSync(UploadsDir)) {
+                fs.mkdirSync(UploadsDir,{recursive:true});
             }
-            const finalPath = path.join(customDir, file.originalname);
-            fs.renameSync(file.path, finalPath);
-
-            const pdfUrl = finalPath.replace(/\\/g, '/');
-            columns.push('pdf_url');
+            fs.renameSync(file.path, FinalFileUploadPath);
+            const pdfUrl = FinalFileUploadPath.replace(/\\/g, '/');
             values.push(pdfUrl);
             parameters.push('?');
+            columns.push('pdf_url')
+
         }
-
-        if (category_id) {
-            columns.push('category_id');
-            values.push(category_id);
-            parameters.push('?');
+        const InsertQuery = `insert into notes(${columns.join(',')}) values(${parameters.join(',')})`
+        try {
+            await pool.query(InsertQuery,values);
+            response
+            .status(StatusCodes.CREATED)
+            .send({message:"Notes Added Successfully"})
+        } catch (error) {
+            console.log(error);
+            response
+            .status(StatusCodes.BAD_REQUEST)
+            .send({message:"Error while inserting data"})
         }
-
-        const uploadQry = `insert into notes(${columns.join(',')}) values(${parameters.join(',')})`
-
-
-        connection
-
+        
+        
     } catch (error) {
         console.log(error);
         response
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .send({ message: "Something went wrong" })
+            .send({ message: "Something went wrong" });
     }
 }
+
