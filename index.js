@@ -1,4 +1,4 @@
-import express, { response } from 'express';
+import express from 'express';
 import dotenv from 'dotenv';
 import { StatusCodes } from 'http-status-codes';
 import { createDbConnection } from './src/DbConfig/DbConfig.js';

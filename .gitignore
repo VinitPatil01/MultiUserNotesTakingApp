@@ -22,3 +22,6 @@ Thumbs.db
 
 # Dependency lock file (optional - keep if using for exact versions)
 # package-lock.json
+
+#upload files
+Pdf_Notes/
