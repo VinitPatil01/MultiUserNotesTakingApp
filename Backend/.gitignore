@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# RSA keys (asymmetric keys for JWT)
+src/keys/PrivateKey.pem
+src/keys/PublicKey.pem
+
+# Logs
+logs/
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE-specific folders
+.vscode/
+.idea/
+
+# Dependency lock file (optional - keep if using for exact versions)
+# package-lock.json
+
+#upload files
+Pdf_Notes/
