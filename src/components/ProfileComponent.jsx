@@ -1,28 +1,55 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { UserIcon, MailIcon, PhoneIcon, BookOpenIcon, MapPinIcon, UsersIcon } from "lucide-react";
+import {
+  UserIcon,
+  MailIcon,
+  PhoneIcon,
+  BookOpenIcon,
+  MapPinIcon,
+  UsersIcon,
+} from "lucide-react";
+import { getStudentProfile, getToken } from "../Services/StudentServices";
 
 const ProfileComponent = () => {
-  const studentDetails = {
-    prn: "1234567890",
-    fullName: "John Doe",
-    email: "john.doe@example.com",
-    mobileNumber: "+1 234 567 890",
-    gender: "Male",
-    course: "Computer Science",
-    center: "Tech Center",
-  };
+  const [profileDetails, setProfileDetails] = useState({
+    studentDetails: {},
+    groupList: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const token = getToken();
 
-  const groups = [
-    { groupId: "1", groupName: "Web Development" },
-    { groupId: "2", groupName: "Machine Learning" },
-    { groupId: "3", groupName: "ReactJS" },
-  ];
+  useEffect(() => {
+    const fetchProfileDetails = async () => {
+      try {
+        const response = await getStudentProfile(token);
+        const data = response.data;
+        setProfileDetails(data);
+      } catch (err) {
+        setError("Failed to fetch Student Details");
+        console.error("Error fetching profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileDetails();
+  }, []);
 
   const fadeIn = {
     hidden: { opacity: 0, y: 30 },
     show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
+
+  if (loading) {
+    return <div className="text-center mt-10">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-600 mt-10">{error}</div>;
+  }
+
+  const { studentDetails, groupList } = profileDetails;
 
   return (
     <motion.div
@@ -39,7 +66,9 @@ const ProfileComponent = () => {
         >
           👤 Profile Overview
         </motion.h1>
-        <p className="text-gray-500">Detailed student information and group affiliations</p>
+        <p className="text-gray-500">
+          Detailed student information and group affiliations
+        </p>
       </div>
 
       {/* Student Info Card */}
@@ -49,29 +78,43 @@ const ProfileComponent = () => {
       >
         <div className="flex items-center space-x-3">
           <UserIcon className="text-purple-500" />
-          <p><strong>Full Name:</strong> {studentDetails.fullName}</p>
+          <p>
+            <strong>Full Name:</strong> {studentDetails.full_name}
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           <MailIcon className="text-purple-500" />
-          <p><strong>Email:</strong> {studentDetails.email}</p>
+          <p>
+            <strong>Email:</strong> {studentDetails.email}
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           <PhoneIcon className="text-purple-500" />
-          <p><strong>Mobile:</strong> {studentDetails.mobileNumber}</p>
+          <p>
+            <strong>Mobile:</strong> {studentDetails.mobile_number}
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           <BookOpenIcon className="text-purple-500" />
-          <p><strong>Course:</strong> {studentDetails.course}</p>
+          <p>
+            <strong>Course:</strong> {studentDetails.course}
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           <MapPinIcon className="text-purple-500" />
-          <p><strong>Center:</strong> {studentDetails.center}</p>
+          <p>
+            <strong>Center:</strong> {studentDetails.center}
+          </p>
         </div>
         <div className="flex items-center space-x-3">
-          <p className="font-semibold"><strong>Gender:</strong> {studentDetails.gender}</p>
+          <p className="font-semibold">
+            <strong>Gender:</strong> {studentDetails.gender}
+          </p>
         </div>
         <div className="flex items-center space-x-3">
-          <p className="font-semibold"><strong>PRN:</strong> {studentDetails.prn}</p>
+          <p className="font-semibold">
+            <strong>PRN:</strong> {studentDetails.prn}
+          </p>
         </div>
       </motion.div>
 
@@ -82,7 +125,7 @@ const ProfileComponent = () => {
           <h3 className="text-xl font-semibold text-gray-800">Your Groups</h3>
         </div>
 
-        {groups.length > 0 ? (
+        {groupList.length > 0 ? (
           <motion.ul
             className="space-y-2 mt-2"
             initial="hidden"
@@ -91,18 +134,18 @@ const ProfileComponent = () => {
               hidden: {},
               show: {
                 transition: {
-                  staggerChildren: 0.15
-                }
-              }
+                  staggerChildren: 0.15,
+                },
+              },
             }}
           >
-            {groups.map((group) => (
+            {groupList.map((group, index) => (
               <motion.li
-                key={group.groupId}
+                key={index}
                 className="bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg px-4 py-2 shadow-sm cursor-pointer transition"
                 variants={fadeIn}
               >
-                {group.groupName}
+                {group}
               </motion.li>
             ))}
           </motion.ul>

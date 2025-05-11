@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
-import { studentLogin, storeToken } from '../Services/StudentServices';
+import { studentLogin, storeToken, getToken } from '../Services/StudentServices';
 
 const LoginComponent = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -21,7 +21,6 @@ const LoginComponent = () => {
     try {
       const response = await studentLogin(formData);
       console.log(response);
-
       if (response.status === 200) {
         storeToken(response.data.token);
         navigate('/dashboard');
