@@ -1,60 +1,45 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom"; // ← Add useNavigate
+import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { studentLogin, storeToken } from '../Services/StudentServices';
 
 const LoginComponent = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // ← Initialize navigate
+  const navigate = useNavigate();
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setError("");
-
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ username, password }),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       alert("Login successful!");
-  //       navigate("/dashboard"); // ← Redirect to Dashboard
-  //     } else {
-  //       setError(data.message || "Login failed");
-  //     }
-  //   } catch (err) {
-  //     setError("Something went wrong. Try again later.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+  const handleChange = (event) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
+  };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const response = await studentLogin(formData);
+      console.log(response);
 
-  // Simulate successful login
-  setTimeout(() => {
-    alert("Login successful!");
-    navigate("/dashboard");
-    setLoading(false);
-  }, 1000);
-};
-
+      if (response.status === 200) {
+        storeToken(response.data.token);
+        navigate('/dashboard');
+      }
+      if (response.status === 400) {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[#d84357] via-[#c63679] to-[#9b2e91]">
+      <ToastContainer position="top-right" autoClose={3000} />
       <motion.div
         initial={{ opacity: 0, y: 50, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -67,9 +52,10 @@ const LoginComponent = () => {
             <label htmlFor="username" className="block text-gray-700">Username</label>
             <input
               id="username"
+              name="username"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={formData.username}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-[#c63679]"
               required
             />
@@ -78,14 +64,14 @@ const LoginComponent = () => {
             <label htmlFor="password" className="block text-gray-700">Password</label>
             <input
               id="password"
+              name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-[#c63679]"
               required
             />
           </div>
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
