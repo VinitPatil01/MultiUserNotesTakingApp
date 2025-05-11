@@ -31,7 +31,7 @@ create table notes(
 note_id INT PRIMARY KEY AUTO_INCREMENT,
 title VARCHAR(50) NOT NULL,
 type VARCHAR(20) NOT NULL,
-text VARCHAR(2000) NOT NULL,
+text  TEXT NOT NULL,
 pdf_url VARCHAR(100),
 created_by CHAR(12) NOT NULL,
 created_at DATETIME NOT NULL,
