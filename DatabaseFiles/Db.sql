@@ -31,7 +31,7 @@ A10 DATETIME
 
 create table categories(
 category_id int primary key AUTO_INCREMENT,
-category_name varchar(30) not null,
+category_name varchar(100) not null,
 A1 INT,
 A2 INT,
 A3 INT,
