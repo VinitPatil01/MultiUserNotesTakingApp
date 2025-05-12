@@ -25,7 +25,9 @@ export async function uploadNotes(request, response) {
                 fs.mkdirSync(UploadsDir,{recursive:true});
             }
             fs.renameSync(file.path, FinalFileUploadPath);
-            const pdfUrl = FinalFileUploadPath.replace(/\\/g, '/');
+
+            const dbFilePath = path.join(username,"/",file.originalname)
+            const pdfUrl = dbFilePath.replace(/\\/g, '/');
             values.push(pdfUrl);
             parameters.push('?');
             columns.push('pdf_url')
