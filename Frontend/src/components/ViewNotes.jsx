@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Document, Page } from 'react-pdf';
 import { pdfjs } from 'react-pdf';
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import { ToastContainer,toast } from "react-toastify";
+import { useParams, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getToken } from "../Services/StudentServices";
-import { updateNotes } from "../Services/notesServices";
-import { getNotesbyId } from "../Services/notesServices";
+import { updateNotes, getNotesbyId } from "../Services/notesServices";
+import { deleteNotes } from "../Services/notesServices"; 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 
 const ViewNotesPage = () => {
     const { note_id } = useParams();
+    const navigate = useNavigate(); 
     const [note, setNote] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -20,7 +20,9 @@ const ViewNotesPage = () => {
     const [editedText, setEditedText] = useState("");
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); 
     var token = getToken();
+    
     const onDocumentLoadSuccess = ({ numPages }) => {
         setNumPages(numPages);
     };
@@ -28,7 +30,7 @@ const ViewNotesPage = () => {
     useEffect(() => {
         const fetchNote = async () => {
             try {
-                const response = await getNotesbyId(note_id,token);
+                const response = await getNotesbyId(note_id, token);
                 setNote(response.data);
                 setEditedText(response.data.text);
                 setLoading(false);
@@ -40,7 +42,7 @@ const ViewNotesPage = () => {
         };
 
         fetchNote();
-    }, [note_id,token]);
+    }, [note_id, token]);
 
     const handleEditToggle = () => {
         setEditMode(!editMode);
@@ -53,15 +55,41 @@ const ViewNotesPage = () => {
     const handleUpdate = async () => {
         try {
             const token = localStorage.getItem("token");
-            await updateNotes(note_id,token,editedText);
+            await updateNotes(note_id, token, editedText);
             setNote((prev) => ({ ...prev, text: editedText }));
             console.log(editedText)
             setEditMode(false);
-            toast.success("Successfull Updated Note")
+            toast.success("Successfully Updated Note")
             
         } catch (err) {
             console.error("Error updating note:", err);
             toast.error("Failed to update note");
+        }
+    };
+
+    // Handler for delete confirmation
+    const handleDeleteConfirm = () => {
+        setShowDeleteConfirm(true);
+    };
+
+   
+    const handleDeleteCancel = () => {
+        setShowDeleteConfirm(false);
+    };
+
+    
+    const handleDelete = async () => {
+        try {
+            await deleteNotes(note_id, token);
+            toast.success("Note successfully deleted");
+            
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 2000);
+        } catch (err) {
+            console.error("Error deleting note:", err);
+            toast.error("Failed to delete note");
+            setShowDeleteConfirm(false);
         }
     };
 
@@ -99,15 +127,26 @@ const ViewNotesPage = () => {
                             <div className="flex justify-between items-center mb-2">
                                 <h2 className="text-xl font-semibold">Content</h2>
                                 {!editMode && (
-                                    <button
-                                        onClick={handleEditToggle}
-                                        className="flex items-center text-blue-600 hover:text-blue-800"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                        Edit
-                                    </button>
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={handleEditToggle}
+                                            className="flex items-center text-blue-600 hover:text-blue-800"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={handleDeleteConfirm}
+                                            className="flex items-center text-red-600 hover:text-red-800"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            Delete
+                                        </button>
+                                    </div>
                                 )}
                             </div>
 
@@ -144,7 +183,18 @@ const ViewNotesPage = () => {
                         </div>
                     ) : (
                         <div className="mt-6">
-                            <h2 className="text-xl font-semibold mb-4">PDF Document</h2>
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">PDF Document</h2>
+                                <button
+                                    onClick={handleDeleteConfirm}
+                                    className="flex items-center text-red-600 hover:text-red-800"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Delete
+                                </button>
+                            </div>
                             <div className="border border-gray-300 rounded">
                                 <div className="flex justify-center items-center p-4 bg-gray-100">
                                     <div className="w-full">
@@ -190,12 +240,36 @@ const ViewNotesPage = () => {
                     )}
                 </div>
 
-                <div className="border-t border-gray-200 p-4 flex justify-end">
+                <div className="border-t border-gray-200 p-4 flex justify-between">
                     <a href="/dashboard" className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
                         Back to Dashboard
                     </a>
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+                        <h3 className="text-xl font-bold mb-4">Confirm Delete</h3>
+                        <p className="mb-6">Are you sure you want to delete this note? This action cannot be undone.</p>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={handleDeleteCancel}
+                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
