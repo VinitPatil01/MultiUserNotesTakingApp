@@ -13,7 +13,6 @@ export async function getNotesbyId(note_id,token){
 
 
 export async function updateNotes(note_id,token,editedText){
-    console.log(note_id)
     return axios.put(`http://localhost:9000/notes/${note_id}`,
         {text:editedText},
         {headers:{'Authorization':`Bearer ${token}`}
@@ -22,7 +21,6 @@ export async function updateNotes(note_id,token,editedText){
 
 
 export async function deleteNotes(note_id,token,editedText){
-    console.log(note_id)
     return axios.delete(`http://localhost:9000/notes/${note_id}`,
         {headers:{'Authorization':`Bearer ${token}`}
     })

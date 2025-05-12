@@ -223,7 +223,7 @@ const ViewNotesPage = () => {
                                                 renderAnnotationLayer={false}
                                                 className="w-full"
                                             >
-                                                <div className="overflow-hidden" style={{ height: '500px' }}>
+                                                <div className="overflow-hidden" style={{ height: '800px' }}>
                                                     <Page
                                                         pageNumber={pageNumber}
                                                         renderTextLayer={false}
