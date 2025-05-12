@@ -6,9 +6,9 @@ export function updateNotes(request, response) {
     try {
         const note_id = request.params.note_id;
         const text = request.body.text;
-        const getGroupNotesQry = `update notes set text=${text} where note_id=${note_id}`;
+        const getGroupNotesQry = `update notes set text=? where note_id=?`;
 
-        connection.query(getGroupNotesQry, (error, result) => {
+        connection.query(getGroupNotesQry,[text,note_id], (error, result) => {
             if (!error) {
                 response
                     .status(StatusCodes.OK)

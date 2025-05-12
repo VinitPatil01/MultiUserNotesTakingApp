@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Document, Page } from 'react-pdf';
 import { pdfjs } from 'react-pdf';
-import { useParams, useNavigate, data } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getToken } from "../Services/StudentServices";
@@ -21,7 +21,7 @@ const ViewNotesPage = () => {
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); 
-    var token = getToken();
+    const token = getToken();
     
     const onDocumentLoadSuccess = ({ numPages }) => {
         setNumPages(numPages);
@@ -31,7 +31,7 @@ const ViewNotesPage = () => {
         const fetchNote = async () => {
             try {
                 const response = await getNotesbyId(note_id, token);
-                console.log(response.data)
+                console.log(response.data);
                 setNote(response.data);
                 setEditedText(response.data.text);
                 setLoading(false);
@@ -55,12 +55,11 @@ const ViewNotesPage = () => {
 
     const handleUpdate = async () => {
         try {
-            const token = localStorage.getItem("token");
             await updateNotes(note_id, token, editedText);
             setNote((prev) => ({ ...prev, text: editedText }));
-            console.log(editedText)
+            console.log(editedText);
             setEditMode(false);
-            toast.success("Successfully Updated Note")
+            toast.success("Successfully Updated Note");
             
         } catch (err) {
             console.error("Error updating note:", err);
@@ -68,17 +67,14 @@ const ViewNotesPage = () => {
         }
     };
 
-    // Handler for delete confirmation
     const handleDeleteConfirm = () => {
         setShowDeleteConfirm(true);
     };
 
-   
     const handleDeleteCancel = () => {
         setShowDeleteConfirm(false);
     };
 
-    
     const handleDelete = async () => {
         try {
             await deleteNotes(note_id, token);
@@ -123,32 +119,34 @@ const ViewNotesPage = () => {
                         <div><span className="font-semibold">Created At:</span> {new Date(note.created_at).toLocaleString()}</div>
                     </div>
 
-                    {note.type === "text" ? (
+                    {note.type === "txt" ? (
                         <div className="mt-6">
                             <div className="flex justify-between items-center mb-2">
                                 <h2 className="text-xl font-semibold">Content</h2>
-                                {!editMode && (
-                                    <div className="flex space-x-2">
-                                        <button
-                                            onClick={handleEditToggle}
-                                            className="flex items-center text-blue-600 hover:text-blue-800"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                            </svg>
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={handleDeleteConfirm}
-                                            className="flex items-center text-red-600 hover:text-red-800"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
+                                <div className="flex space-x-2">
+                                    {!editMode && (
+                                        <>
+                                            <button
+                                                onClick={handleEditToggle}
+                                                className="flex items-center text-blue-600 hover:text-blue-800"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={handleDeleteConfirm}
+                                                className="flex items-center text-red-600 hover:text-red-800"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Delete
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
 
                             {editMode ? (
@@ -182,7 +180,7 @@ const ViewNotesPage = () => {
                                 </div>
                             )}
                         </div>
-                    ) : (
+                    ) : note.type === "pdf" && (
                         <div className="mt-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-semibold">PDF Document</h2>
@@ -225,7 +223,7 @@ const ViewNotesPage = () => {
                                                 renderAnnotationLayer={false}
                                                 className="w-full"
                                             >
-                                                <div className="overflow-hidden" style={{ height: '1000px' }}>
+                                                <div className="overflow-hidden" style={{ height: '500px' }}>
                                                     <Page
                                                         pageNumber={pageNumber}
                                                         renderTextLayer={false}
