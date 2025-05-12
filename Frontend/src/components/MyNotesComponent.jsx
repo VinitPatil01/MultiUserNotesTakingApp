@@ -13,6 +13,7 @@ const MyNotes = () => {
       try {
         const response = await getSelfNotes(token);
         setNotes(response.data);
+        console.log(response.data)
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch dashboard data");
@@ -32,6 +33,7 @@ const MyNotes = () => {
   }
 
   const handleView = (note_id)=>{
+    console.log(note_id)
     navigate(`/viewnotes/${note_id}`)
   }
   return (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Document, Page } from 'react-pdf';
 import { pdfjs } from 'react-pdf';
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, data } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getToken } from "../Services/StudentServices";
@@ -31,6 +31,7 @@ const ViewNotesPage = () => {
         const fetchNote = async () => {
             try {
                 const response = await getNotesbyId(note_id, token);
+                console.log(response.data)
                 setNote(response.data);
                 setEditedText(response.data.text);
                 setLoading(false);

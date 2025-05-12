@@ -9,7 +9,7 @@ export function deleteNotes(request, response) {
 
         connection.query(getGroupNotesQry, (error, result) => {
             if (!error) {
-                result.status(StatusCodes.OK).send({message:"Successfully Deleted Notes"})
+                response.status(StatusCodes.OK).send({message:"Successfully Deleted Notes"})
             } else {
                 console.log(error)
                 response
