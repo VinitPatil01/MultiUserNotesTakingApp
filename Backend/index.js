@@ -25,7 +25,7 @@ app.get("/", (request, response) => {
 app.use("/student",StudentRouter)
 app.use("/notes",notesRouter)
 
-app.listen(port, (error) => {
+app.listen(port, '0.0.0.0',(error) => {
     console.log("Server Started Successfully........")
     console.log("http://localhost:"+port)
 });
